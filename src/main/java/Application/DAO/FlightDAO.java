@@ -33,7 +33,7 @@ public class FlightDAO {
         List<Flight> flights = new ArrayList<>();
         try {
             //Write SQL logic here
-            String sql = "change me";
+            String sql = "SELECT * FROM flight";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet rs = preparedStatement.executeQuery();
@@ -65,20 +65,19 @@ public class FlightDAO {
     public Flight getFlightById(int id){
         Connection connection = ConnectionUtil.getConnection();
         try {
-            //Write SQL logic here
-            String sql = "change me";
-            
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
+            String sql = "SELECT * FROM flight WHERE flight_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);     
             //write preparedStatement's setString and setInt methods here.
 
+            preparedStatement.setInt(1, id);
+    
             ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
+            if(rs.next()){
                 Flight flight = new Flight(rs.getInt("flight_id"), rs.getString("departure_city"),
                         rs.getString("arrival_city"));
                 return flight;
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return null;
@@ -108,11 +107,12 @@ public class FlightDAO {
         try {
             //Write SQL logic here. When inserting, you only need to define the departure_city and arrival_city
             //values (two columns total!)
-            String sql = "change me" ;
+            String sql = "INSERT INTO flight (departure_city, arrival_city) VALUES (?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             //write preparedStatement's setString and setInt methods here.
-
+            preparedStatement.setString(1, flight.getDeparture_city());
+            preparedStatement.setString(2, flight.getArrival_city());
 
             preparedStatement.executeUpdate();
             ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
@@ -126,38 +126,42 @@ public class FlightDAO {
         return null;
     }
 
-    /**
-     * TODO: Update the flight identified by the flight id to the values contained in the flight object.
-     *
-     * You only need to change the sql String and set preparedStatement parameters.
-     *
-     * Remember that the format of an update PreparedStatement written as a Java String looks something like this:
-     * String sql = "update TableName set ColumnName1=?, ColumnName2=? where ColumnName3 = ?;";
-     * The question marks will be filled in by the preparedStatement setString, setInt, etc methods. they follow
-     * this format, where the first argument identifies the question mark to be filled (left to right, starting
-     * from zero) and the second argument identifies the value to be used:
-     * preparedStatement.setString(1,string1);
-     * preparedStatement.setString(2,string2);
-     * preparedStatement.setInt(3,int1);
-     *
-     * @param id a flight ID.
-     * @param flight a flight object. the flight object does not contain a flight ID.
-     */
-    public void updateFlight(int id, Flight flight){
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            //Write SQL logic here
-            String sql = "change me";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+/**
+ * TODO: Update the flight identified by the flight id to the values contained in the flight object.
+ *
+ * You only need to change the sql String and set preparedStatement parameters.
+ *
+ * Remember that the format of an update PreparedStatement written as a Java String looks something like this:
+ * String sql = "update TableName set ColumnName1=?, ColumnName2=? where ColumnName3 = ?;";
+ * The question marks will be filled in by the preparedStatement setString, setInt, etc methods. they follow
+ * this format, where the first argument identifies the question mark to be filled (left to right, starting
+ * from zero) and the second argument identifies the value to be used:
+ * preparedStatement.setString(1,string1);
+ * preparedStatement.setString(2,string2);
+ * preparedStatement.setInt(3,int1);
+ *
+ * @param id a flight ID.
+ * @param flight a flight object. the flight object does not contain a flight ID.
+ * @return true if the update operation was successful; false otherwise.
+ */
+public Void updateFlight(int id, Flight flight){
+    Connection connection = ConnectionUtil.getConnection();
+    try {
+        String sql = "UPDATE flight SET departure_city=?, arrival_city = ?  WHERE flight_id = ?;";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-            //write PreparedStatement setString and setInt methods here.
+        //write preparedStatement's setString and setInt methods here.
+        
+        preparedStatement.setString(1, flight.getDeparture_city());
+        preparedStatement.setString(2, flight.getArrival_city());
+        preparedStatement.setInt(3, id);
 
-
-            preparedStatement.executeUpdate();
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
+        preparedStatement.executeUpdate();
+    } catch(SQLException e){
+        System.out.println(e.getMessage());
     }
+    return null;
+}
 
     /**
      * TODO: Retrieve all flights following a particular flight path.
@@ -181,11 +185,12 @@ public class FlightDAO {
         List<Flight> flights = new ArrayList<>();
         try {
             //Write SQL logic here
-            String sql = "change me";
+            String sql = "SELECT * FROM flight WHERE departure_city = ? AND arrival_city = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             //write PreparedStatement setString and setInt methods here.
-
+            preparedStatement.setString(1, departure_city);
+            preparedStatement.setString(2, arrival_city);
 
             ResultSet rs = preparedStatement.executeQuery();
             while(rs.next()){
